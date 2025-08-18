@@ -1,48 +1,101 @@
+// JS for click-and-dragging individual cubes inside the .items boundary
+
 const items = document.querySelector(".items");
-const cubes = document.querySelectorAll(".item");
+const cubes = Array.from(document.querySelectorAll(".item"));
 
-let selectedCube = null;
-let offsetX = 0;
-let offsetY = 0;
+let dragging = false;
+let selected = null;
+let startX = 0;
+let startY = 0;
+let startLeft = 0;
+let startTop = 0;
 
-cubes.forEach(cube => {
-  cube.style.position = "absolute"; // allow free movement
-  // set initial positions based on current layout
-  const rect = cube.getBoundingClientRect();
+// Helper to clamp within container bounds
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(v, max));
+}
+
+// Initialize: convert current visual positions to absolute coords
+function initAbsolutePositions() {
   const parentRect = items.getBoundingClientRect();
-  cube.style.left = rect.left - parentRect.left + "px";
-  cube.style.top = rect.top - parentRect.top + "px";
 
-  // mouse down - start dragging
+  cubes.forEach((cube) => {
+    // Establish absolute positioning once
+    cube.style.position = "absolute";
+    cube.style.willChange = "left, top";
+    // Compute current position relative to the container's padding box
+    const r = cube.getBoundingClientRect();
+    const left = r.left - parentRect.left;
+    const top = r.top - parentRect.top;
+
+    cube.style.left = `${left}px`;
+    cube.style.top = `${top}px`;
+  });
+}
+
+initAbsolutePositions();
+
+// Start dragging on mousedown
+cubes.forEach((cube) => {
   cube.addEventListener("mousedown", (e) => {
-    selectedCube = cube;
-    const cubeRect = cube.getBoundingClientRect();
-    offsetX = e.clientX - cubeRect.left;
-    offsetY = e.clientY - cubeRect.top;
-    cube.style.zIndex = 1000; // bring to front
+    e.preventDefault();
+
+    selected = cube;
+    dragging = true;
+
+    items.classList.add("active");
+    selected.style.zIndex = "1000";
+
+    startX = e.clientX;
+    startY = e.clientY;
+
+    // Current numeric left/top as starting point
+    startLeft = parseFloat(selected.style.left) || 0;
+    startTop = parseFloat(selected.style.top) || 0;
   });
 });
 
-// mouse move - drag
+// Move with mouse
 document.addEventListener("mousemove", (e) => {
-  if (!selectedCube) return;
+  if (!dragging || !selected) return;
+
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
 
   const parentRect = items.getBoundingClientRect();
-  let newLeft = e.clientX - parentRect.left - offsetX;
-  let newTop = e.clientY - parentRect.top - offsetY;
+  const maxLeft = parentRect.width - selected.offsetWidth;
+  const maxTop = parentRect.height - selected.offsetHeight;
 
-  // boundary constraints
-  newLeft = Math.max(0, Math.min(newLeft, parentRect.width - selectedCube.offsetWidth));
-  newTop = Math.max(0, Math.min(newTop, parentRect.height - selectedCube.offsetHeight));
+  let newLeft = clamp(startLeft + dx, 0, maxLeft);
+  let newTop = clamp(startTop + dy, 0, maxTop);
 
-  selectedCube.style.left = newLeft + "px";
-  selectedCube.style.top = newTop + "px";
+  selected.style.left = `${newLeft}px`;
+  selected.style.top = `${newTop}px`;
 });
 
-// mouse up - drop
+// Drop on mouseup
 document.addEventListener("mouseup", () => {
-  if (selectedCube) {
-    selectedCube.style.zIndex = "";
-    selectedCube = null;
+  if (!dragging) return;
+
+  dragging = false;
+  if (selected) {
+    selected.style.zIndex = "";
   }
+  items.classList.remove("active");
+  selected = null;
+});
+
+// Keep cubes inside if window resizes
+window.addEventListener("resize", () => {
+  const parentRect = items.getBoundingClientRect();
+  cubes.forEach((cube) => {
+    const maxLeft = parentRect.width - cube.offsetWidth;
+    const maxTop = parentRect.height - cube.offsetHeight;
+
+    let left = parseFloat(cube.style.left) || 0;
+    let top = parseFloat(cube.style.top) || 0;
+
+    cube.style.left = `${clamp(left, 0, maxLeft)}px`;
+    cube.style.top = `${clamp(top, 0, maxTop)}px`;
+  });
 });
