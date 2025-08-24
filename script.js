@@ -1,58 +1,30 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.querySelector('.container');
-  const cubes = document.querySelectorAll('.cube');
-  let selectedCube = null;
-  let offsetX, offsetY;
+const items = document.querySelector(".items");
 
-  // Initial grid positions
-  cubes.forEach((cube, index) => {
-    const row = Math.floor(index / 2);
-    const col = index % 2;
-    cube.style.left = `${col * 110 + 10}px`; // 100px cube + 10px gap
-    cube.style.top = `${row * 110 + 10}px`;
-  });
+let isDown = false;
+let startX;
+let scrollLeft;
 
-  // Mouse event handlers
-  cubes.forEach(cube => {
-    cube.addEventListener('mousedown', startDragging);
-  });
+items.addEventListener("mousedown", (e) => {
+  isDown = true;
+  items.classList.add("active");
+  startX = e.pageX - items.offsetLeft;
+  scrollLeft = items.scrollLeft;
+});
 
-  document.addEventListener('mousemove', drag);
-  document.addEventListener('mouseup', stopDragging);
+items.addEventListener("mouseleave", () => {
+  isDown = false;
+  items.classList.remove("active");
+});
 
-  function startDragging(e) {
-    selectedCube = e.target;
-    selectedCube.classList.add('dragging');
-    
-    // Calculate offset from mouse to cube's top-left corner
-    const rect = selectedCube.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-  }
+items.addEventListener("mouseup", () => {
+  isDown = false;
+  items.classList.remove("active");
+});
 
-  function drag(e) {
-    if (!selectedCube) return;
-
-    // Get container boundaries
-    const containerRect = container.getBoundingClientRect();
-    
-    // Calculate new position
-    let newX = e.clientX - offsetX;
-    let newY = e.clientY - offsetY;
-
-    // Enforce boundary constraints
-    newX = Math.max(containerRect.left, Math.min(newX, containerRect.right - selectedCube.offsetWidth));
-    newY = Math.max(containerRect.top, Math.min(newY, containerRect.bottom - selectedCube.offsetHeight));
-
-    // Update cube position relative to container
-    selectedCube.style.left = `${newX - containerRect.left}px`;
-    selectedCube.style.top = `${newY - containerRect.top}px`;
-  }
-
-  function stopDragging() {
-    if (selectedCube) {
-      selectedCube.classList.remove('dragging');
-      selectedCube = null;
-    }
-  }
+items.addEventListener("mousemove", (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - items.offsetLeft;
+  const walk = (x - startX) * 2; // scroll-fast factor
+  items.scrollLeft = scrollLeft - walk;
 });

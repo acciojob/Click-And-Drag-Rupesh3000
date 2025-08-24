@@ -1,27 +1,27 @@
-.container {
-  width: 500px;
-  height: 400px;
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background: #f0f0f0;
+}
+
+.items {
+  width: 600px;
+  height: 200px;
   border: 2px solid #333;
-  position: relative;
-  margin: 50px auto;
-  background-color: #f0f0f0;
-  display: grid;
-  grid-template-columns: repeat(2, 100px);
-  grid-gap: 10px;
-  padding: 10px;
-  box-sizing: border-box;
+  background: #fff;
+  overflow-x: scroll;   /* enable horizontal scroll */
+  white-space: nowrap;  /* keep cubes inline horizontally */
+  cursor: grab;
 }
 
 .cube {
-  width: 100px;
-  height: 100px;
-  background-color: #4CAF50;
-  cursor: move;
-  position: absolute;
-  user-select: none;
-}
-
-.cube.dragging {
-  opacity: 0.7;
-  border: 2px solid #007bff;
+  width: 150px;
+  height: 150px;
+  display: inline-block;
+  margin: 10px;
+  background: #4CAF50;
+  border-radius: 8px;
 }
