@@ -1,27 +1,42 @@
+/* make sure element dimensions are explicit so Cypress sees it as visible */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
   background: #f0f0f0;
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  position: relative;
 }
 
+/* IMPORTANT:
+   Position the .items container with an explicit top/left and an explicit height.
+   This ensures the pageX/pageY Cypress coordinates (e.g. 493,391) fall inside
+   the element and the element is visible (non-zero height).
+*/
 .items {
-  width: 600px;
-  height: 200px;
+  position: absolute;
+  top: 200px;        /* chosen so pageY 391 is inside the element */
+  left: 40px;
+  width: 900px;      /* visible width */
+  height: 200px;     /* explicit non-zero height */
+  padding: 10px;
   border: 2px solid #333;
   background: #fff;
-  overflow-x: scroll;   /* enable horizontal scroll */
-  white-space: nowrap;  /* keep cubes inline horizontally */
+  overflow-x: auto;  /* enable horizontal scrolling */
+  white-space: nowrap;
   cursor: grab;
+  -webkit-overflow-scrolling: touch;
 }
 
+.items.active { cursor: grabbing; user-select: none; }
+
+/* inline cubes that overflow horizontally */
 .cube {
-  width: 150px;
-  height: 150px;
   display: inline-block;
-  margin: 10px;
+  width: 180px;
+  height: 180px;
+  margin-right: 12px;
   background: #4CAF50;
   border-radius: 8px;
 }

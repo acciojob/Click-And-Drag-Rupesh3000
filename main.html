@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Click and Drag Scroll</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="items">
+  <div class="items" aria-label="draggable-items">
+    <!-- plenty of cubes so the container overflows horizontally -->
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
     <div class="cube"></div>
     <div class="cube"></div>
     <div class="cube"></div>
@@ -18,6 +22,6 @@
     <div class="cube"></div>
   </div>
 
-  <script src="./script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
